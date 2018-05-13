@@ -1,14 +1,17 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class GradeScript : MonoBehaviour {
 
 	public int MaxGrade = 100;
 	public Text GradeText;
+	public GameObject GameOverMenu;
 	
 	private int _sodaCollected;
 	private int _booksCollected;
 	private int _badGradesCollected;
+	private int _timeOffset;
 	
 	// Use this for initialization
 
@@ -17,6 +20,10 @@ public class GradeScript : MonoBehaviour {
 	{
 		//100 + soda + calc
 		float value = MaxGrade + SodaScore() + CalcScore();
+		if (value >= 50)
+		{
+			GradeText.text = "A";
+		}
 		if (value < 50)
 		{
 			GradeText.text = "A-";
@@ -54,22 +61,37 @@ public class GradeScript : MonoBehaviour {
 		
 		if (value <= 0)
 		{
-			GradeText.text = "You Lost Your Scholarship!";
-			gameObject.SetActive(false);
+			GradeText.text = "";
+//			gameObject.SetActive(false);
+			GameOverMenu.SetActive(true);
+		}
+		else
+		{
+//			gameObject.SetActive(true);
+			GameOverMenu.SetActive(false);
 		}
 		gameObject.GetComponent<Slider>().value = value;
+	}
+
+	public void StartOver()
+	{
+		MaxGrade = 100;
+		_sodaCollected = 0;
+		_badGradesCollected = 0;
+		_booksCollected = 0;
+		_timeOffset = Time.frameCount;
 	}
 
 	private float SodaScore()
 	{
 		//soda = sodas * 5 + ticks * -.01
-		return _sodaCollected * 5 + Time.frameCount * -.01f;
+		return _sodaCollected * 5 + (Time.frameCount - _timeOffset) * -.01f;
 	}
 
 	private float CalcScore()
 	{
 		//calc = calc * 5 - 8 * badGrades + -.05 * ticks
-		return _booksCollected * 5 - _badGradesCollected * 8 + Time.frameCount * -.05f;
+		return _booksCollected * 5 - _badGradesCollected * 8 + (Time.frameCount - _timeOffset) * -.05f;
 	}
 
 	public void AddSoda()

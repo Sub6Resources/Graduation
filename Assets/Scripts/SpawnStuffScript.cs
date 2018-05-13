@@ -23,7 +23,11 @@ public class SpawnStuffScript : MonoBehaviour
 	{
 		_spawnDelay -= Time.deltaTime;
 		Console.WriteLine(Time.deltaTime);
-		SpawnDelay -= Decay * Time.deltaTime * 2 * Time.realtimeSinceStartup;
+		if (SpawnDelay >= 1)
+		{
+			SpawnDelay -= Decay * Time.deltaTime * 2 * Time.realtimeSinceStartup;
+		}
+
 		if (_spawnDelay <= 0)
 		{
 			_spawnDelay = SpawnDelay;
