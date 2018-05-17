@@ -7,42 +7,29 @@ using UnityEngine;
 public class JumpScript : MonoBehaviour
 {
 	public float JumpForce = 6.5f;
-	private bool _jumping = false;
+	private bool _jumping;
 
 	private bool _doubleJumped;
 
 	public GradeScript GradeManager;
+	public SpawnStuffScript SpawnManager;
 
 	// Update is called once per frame
 	private void Update () {
-
-		#if UNITY_STANDALONE || UNITY_WEBPLAYER
-		if(Input.GetButtonDown("Jump")) {
-			Jump ();
-		}
-		#endif
 		
-		foreach (Touch touch in Input.touches) {
+		if (Input.GetButtonDown("Jump"))
+			Jump();
 
-			if (touch.fingerId == 0) {
+		foreach (Touch touch in Input.touches)
+			if (touch.fingerId == 0)
 				if (Input.GetTouch(0).phase == TouchPhase.Began)
-				{
 					Jump();
-				}
-				if (Input.GetTouch(0).phase == TouchPhase.Ended) {
-					Debug.Log("First finger left.");
-				}
-			}
-		}
-
 	}
 
 	private void Jump() {
-		if (!_jumping)
-		{
-			_jumping = true;
-			GetComponent<Rigidbody2D>().velocity = new Vector2(GetComponent<Rigidbody2D>().velocity.x, JumpForce);
-		}
+		if (_jumping || !SpawnManager.GameRunning) return;
+		_jumping = true;
+		GetComponent<Rigidbody2D>().velocity = new Vector2(GetComponent<Rigidbody2D>().velocity.x, JumpForce);
 	}
 
 	private void OnCollisionEnter2D(Collision2D other) {

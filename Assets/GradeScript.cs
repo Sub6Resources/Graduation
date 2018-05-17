@@ -12,6 +12,8 @@ public class GradeScript : MonoBehaviour {
 	private int _booksCollected;
 	private int _badGradesCollected;
 	private int _timeOffset;
+
+	public SpawnStuffScript SpawnManager;
 	
 	// Use this for initialization
 
@@ -62,11 +64,13 @@ public class GradeScript : MonoBehaviour {
 		if (value <= 0)
 		{
 			GradeText.text = "";
+			SpawnManager.GameRunning = false;
 //			gameObject.SetActive(false);
 			GameOverMenu.SetActive(true);
 		}
 		else
 		{
+			SpawnManager.GameRunning = true;
 //			gameObject.SetActive(true);
 			GameOverMenu.SetActive(false);
 		}
