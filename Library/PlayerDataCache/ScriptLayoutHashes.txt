@@ -1,6 +1,6 @@
 Android
 PlayerPath?
-/Users/whitaker/Documents/Graduation/BuildTest2.apk
+/Users/whitaker/Documents/Graduation/GraduationProduction2.apk
 SceneListBegin?
 Assets/Scenes/SampleScene.unity
 SceneListEnd?
