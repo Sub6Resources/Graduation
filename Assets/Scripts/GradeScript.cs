@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using Firebase;
+using Firebase.Database;
+using Firebase.Unity.Editor;
 
 public class GradeScript : MonoBehaviour {
 
@@ -14,8 +17,16 @@ public class GradeScript : MonoBehaviour {
 	private int _timeOffset;
 
 	public SpawnStuffScript SpawnManager;
+
+	private DatabaseReference reference;
 	
 	// Use this for initialization
+	void Start ()
+	{
+		FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://graduation-ryanberger.firebaseio.com/");
+		
+		reference = FirebaseDatabase.DefaultInstance.RootReference;
+	}
 
 	// Update is called once per frame
 	void Update ()
@@ -84,6 +95,14 @@ public class GradeScript : MonoBehaviour {
 		_badGradesCollected = 0;
 		_booksCollected = 0;
 		_timeOffset = Time.frameCount;
+		writeNewUser("0000", "", "");
+	}
+	
+	private void writeNewUser(string userId, string name, string email)
+	{
+		string json = "{'name': 'kevin'}";
+
+		reference.Child("users").Child(userId).SetRawJsonValueAsync(json);
 	}
 
 	private float SodaScore()

@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "387933328544",
+    "firebase_url": "https://graduation-ryanberger.firebaseio.com",
+    "project_id": "graduation-ryanberger",
+    "storage_bucket": "graduation-ryanberger.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:387933328544:android:af2750bf4eb0ddb3",
+        "android_client_info": {
+          "package_name": "me.ryanberger.graduation"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "387933328544-n50lpt3vdjgri8uo5anoo45831q7i693.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
