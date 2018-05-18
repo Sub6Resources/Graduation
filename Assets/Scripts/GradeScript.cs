@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Firebase;
 using Firebase.Database;
 using Firebase.Unity.Editor;
+using UnityEngine.SceneManagement;
 
 public class GradeScript : MonoBehaviour {
 
@@ -15,17 +17,25 @@ public class GradeScript : MonoBehaviour {
 	private int _booksCollected;
 	private int _badGradesCollected;
 	private int _timeOffset;
+	private int _latestTimeSnapshot;
 
 	public SpawnStuffScript SpawnManager;
 
 	private DatabaseReference reference;
+
+	public InputField NameInput;
+	public GameObject LeaderboardDialog;
+	private int _currentScore;
 	
 	// Use this for initialization
 	void Start ()
 	{
 		FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://graduation-ryanberger.firebaseio.com/");
-		
+		FirebaseApp.DefaultInstance.SetEditorP12FileName("Graduation-2a14a91f999d.p12");
+		FirebaseApp.DefaultInstance.SetEditorServiceAccountEmail("graduation-ryanberger@appspot.gserviceaccount.com");
+		FirebaseApp.DefaultInstance.SetEditorP12Password("notasecret");
 		reference = FirebaseDatabase.DefaultInstance.RootReference;
+		StartOver();
 	}
 
 	// Update is called once per frame
@@ -72,17 +82,37 @@ public class GradeScript : MonoBehaviour {
 			GradeText.text = "C-";
 		}
 		
-		if (value <= 0)
+		if (value <= 0 && SpawnManager.GameRunning)
 		{
 			GradeText.text = "";
 			SpawnManager.GameRunning = false;
-//			gameObject.SetActive(false);
 			GameOverMenu.SetActive(true);
+			
+			_latestTimeSnapshot = Time.frameCount - _timeOffset;
+//			_currentScore = (_sodaCollected + _booksCollected + _latestTimeSnapshot) * _latestTimeSnapshot /
+//			               ((_badGradesCollected + 1) * 5);
+			_currentScore = _latestTimeSnapshot;
+			
+			reference.OrderByChild("score").LimitToLast(5).GetValueAsync().ContinueWith(task => {
+				if (task.IsFaulted) {
+					// Handle the error...
+				}
+				else if (task.IsCompleted) {
+					DataSnapshot snapshot = task.Result;
+					// Do something with snapshot...
+					foreach (var leaderboardEntry in snapshot.Children)
+					{
+						if (Int32.Parse(leaderboardEntry.Child("score").Value.ToString()) < _currentScore)
+						{
+							LeaderboardDialog.SetActive(true);
+						}
+					}
+				}
+			});
 		}
-		else
+		else if(value > 0)
 		{
 			SpawnManager.GameRunning = true;
-//			gameObject.SetActive(true);
 			GameOverMenu.SetActive(false);
 		}
 		gameObject.GetComponent<Slider>().value = value;
@@ -95,14 +125,49 @@ public class GradeScript : MonoBehaviour {
 		_badGradesCollected = 0;
 		_booksCollected = 0;
 		_timeOffset = Time.frameCount;
-		writeNewUser("0000", "", "");
+	}
+
+	public void MainMenu()
+	{
+		StartOver();
+		SceneManager.LoadScene("MainMenu");
+	}
+
+	public void SubmitLeaderboard()
+	{
+		if (SubmitLeaderboardLogic())
+		{
+			LeaderboardDialog.SetActive(false);
+		}
+	}
+
+	private bool SubmitLeaderboardLogic()
+	{
+		var text = NameInput.text;
+		if (text.Length < 2) return false;
+		newLeaderboardEntry(reference.Push(), text, _currentScore);
+		return true;
 	}
 	
-	private void writeNewUser(string userId, string name, string email)
-	{
-		string json = "{'name': 'kevin'}";
+	private class LeaderboardEntry {
+		public string name;
+		public int score;
 
-		reference.Child("users").Child(userId).SetRawJsonValueAsync(json);
+		public LeaderboardEntry() {
+		}
+
+		public LeaderboardEntry(string name, int score) {
+			this.name = name;
+			this.score = score;
+		}
+	}
+	
+	private void newLeaderboardEntry(DatabaseReference id, string playerName, int score)
+	{
+		LeaderboardEntry user = new LeaderboardEntry(playerName, score);
+		string json = JsonUtility.ToJson(user);
+
+		id.SetRawJsonValueAsync(json);
 	}
 
 	private float SodaScore()

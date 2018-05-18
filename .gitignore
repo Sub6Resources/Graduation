@@ -103,3 +103,7 @@ sysinfo.txt
 
 
 # End of https://www.gitignore.io/api/unity,jetbrains
+
+# Private
+*.p12
+*.p12.meta

@@ -29,6 +29,8 @@
         <e p="Scripts" t="Include">
           <e p="GradeScript.cs" t="Include" />
           <e p="JumpScript.cs" t="Include" />
+          <e p="LeaderboardScript.cs" t="Include" />
+          <e p="MainMenuButtonHandler.cs" t="Include" />
           <e p="MoveLeftScript.cs" t="Include" />
           <e p="SpawnStuffScript.cs" t="Include" />
         </e>
