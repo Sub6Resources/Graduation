@@ -22,6 +22,7 @@ public class GradeScript : MonoBehaviour {
 	public SpawnStuffScript SpawnManager;
 
 	private DatabaseReference reference;
+	private Firebase.Auth.FirebaseAuth auth;
 
 	public InputField NameInput;
 	public GameObject LeaderboardDialog;
@@ -35,6 +36,29 @@ public class GradeScript : MonoBehaviour {
 		FirebaseApp.DefaultInstance.SetEditorServiceAccountEmail("graduation-ryanberger@appspot.gserviceaccount.com");
 		FirebaseApp.DefaultInstance.SetEditorP12Password("notasecret");
 		reference = FirebaseDatabase.DefaultInstance.RootReference;
+		
+		auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+		if(auth.CurrentUser != null) {}
+		else
+		{
+			auth.SignInAnonymouslyAsync().ContinueWith(task =>
+			{
+				if (task.IsCanceled)
+				{
+					Debug.LogError("SignInAnonymouslyAsync was canceled.");
+					return;
+				}
+
+				if (task.IsFaulted)
+				{
+					Debug.LogError("SignInAnonymouslyAsync encountered an error: " + task.Exception);
+					return;
+				}
+
+				Debug.Log("Signed In!");
+			});
+		}
+
 		StartOver();
 	}
 
@@ -145,8 +169,17 @@ public class GradeScript : MonoBehaviour {
 	{
 		var text = NameInput.text;
 		if (text.Length < 2) return false;
-		newLeaderboardEntry(reference.Push(), text, _currentScore);
+		if (auth.CurrentUser != null)
+		{
+			newLeaderboardEntry(reference.Push(), text, _currentScore);
+		}
+		else
+		{
+			return false;
+		}
+
 		return true;
+
 	}
 	
 	private class LeaderboardEntry {
